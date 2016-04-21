@@ -32,15 +32,8 @@ module.exports = function (grunt) {
 
 	function createYamlSchema(customTypes) {
 		var yamlTypes = [];
-		console.dir(customTypes);
 
 
-		for (var key in customTypes) {
-			if (customTypes.hasOwnProperty(key)) {
-				console.log(key)
-			}
-
-		}
 		_.each(customTypes, function (resolver, tagAndKindString) {
 			var tagAndKind = tagAndKindString.split(/\s+/);
 			var yamlType = new yaml.Type(tagAndKind[0], {
@@ -77,9 +70,7 @@ module.exports = function (grunt) {
 
 		var readOptions = {
 			encoding: options.readEncoding
-		};
-
-		var SYMBOLS = {};
+		}
 
 		yamlSchema = createYamlSchema(options.customTypes);
 		strictOption = options.strict;
