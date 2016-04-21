@@ -1,0 +1,33 @@
+name: login
+label: 用户登录接口定义
+url: ./service/login
+description: |
+type: POST
+requestParams:
+  - name: userName
+    type: string
+    label: |
+      用户名
+  - name: password
+    type: string
+    label: |
+      密码
+requestBody:
+  type: Object
+  description: |
+    <code>
+      {
+      userName:"tom",
+      password:"tom123"
+      }
+    </code>
+
+response:
+  type: Object
+  description: |
+    <code>
+      {
+      type:true,
+      message:"验证通过！"
+      }
+    </code>

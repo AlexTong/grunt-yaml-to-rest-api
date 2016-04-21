@@ -49,7 +49,7 @@ block content
 						.type=api.response.type || "Object"
 					label 详细描述
 					pre.description!=api.response.description
-	.ui.pointing.menu
+	.ui.pointing.secondary.menu
 		each item in interfaces
 			+_makeAPIButtons(item)
 

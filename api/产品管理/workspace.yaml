@@ -1,0 +1,30 @@
+- name: 获得系统消息
+  url: ./service/frame/messages
+  type: GET
+  response:
+    type: Object
+    description: |
+      <code>
+        [
+          {
+            type:"message",
+            content:14
+          },
+          {
+            type:"task",
+            content:20
+          }
+         ]
+      </code>
+- name: 获得用户基本信息
+  url: ./service/user/detail-info
+  type: GET
+  response:
+    type: Object
+    description: |
+      <code>
+        {
+          name:"Alex Tong"
+          avatar:"./resources/avatars/alex.png"
+        }
+      </code>

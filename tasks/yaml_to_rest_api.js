@@ -32,8 +32,6 @@ module.exports = function (grunt) {
 
 	function createYamlSchema(customTypes) {
 		var yamlTypes = [];
-
-
 		_.each(customTypes, function (resolver, tagAndKindString) {
 			var tagAndKind = tagAndKindString.split(/\s+/);
 			var yamlType = new yaml.Type(tagAndKind[0], {
@@ -70,18 +68,76 @@ module.exports = function (grunt) {
 
 		var readOptions = {
 			encoding: options.readEncoding
-		}
+		};
 
 		yamlSchema = createYamlSchema(options.customTypes);
 		strictOption = options.strict;
 		var pages = [];
+		var rootFile = {
+			isDir: true,
+			name: "<ROOT>",
+			path: "",
+			files: []
+		};
 
+		function findDir(dirName, parent) {
+			var nFiles = parent.files;
+			for (var i = 0; i < nFiles.length; i++) {
+				var child = nFiles[i];
+				if (child.isDir) {
+					if (child.path == dirName) {
+						return child
+					} else {
+						var result = findDir(dirName, child);
+						if (result) {
+							return result;
+						}
+					}
+				}
+			}
+		}
+
+		function addDir(dirName) {
+			var dirs = dirName.split(path.sep);
+			var pathN = "";
+			for (var i = 0; i < dirs.length; i++) {
+				var pathOld = pathN;
+				pathN += path.sep + dirs[i];
+				var result = findDir(pathN, rootFile);
+				if (!result) {
+					if (i == 0) {
+						rootFile.files.push({
+							name: dirs[i],
+							isDir: true,
+							path: pathN,
+							files: []
+						})
+					} else {
+						findDir(pathOld, rootFile).files.push({
+							name: dirs[i],
+							isDir: true,
+							path: pathN,
+							files: []
+						});
+					}
+				}
+			}
+		}
+
+		function addFile(filePath) {
+			var pathObj = path.parse(filePath)
+			var dirName = pathObj.dir;
+			console.log(pathObj);
+			addDir(dirName);
+			var parentNode = findDir(path.sep + dirName, rootFile);
+			parentNode.files.push({
+				name: pathObj.name,
+				path: filePath
+			})
+		}
 
 		_.each(this.files, function (filePair) {
-
-
 			filePair.src.forEach(function (src) {
-
 				if (grunt.file.isDir(src) || (options.ignored && path.basename(src).match(options.ignored))) {
 					return;
 				}
@@ -107,12 +163,17 @@ module.exports = function (grunt) {
 					addApi(result)
 				}
 				pages.push(page);
+
+				addFile(page.filePath);
 			});
 		});
 
 
 		var dest = path.join(process.cwd(), options.output);
 		var tamplate = path.join(__dirname, "..", "templates", "api.jade");
+		var indexHtml = jade.renderFile(path.join(__dirname, "..", "templates", "index.jade"), {contextPath: ""});
+		grunt.file.write(path.join(dest, "index.html"), indexHtml);
+
 		for (var i = 0; i < pages.length; i++) {
 			var page = pages[i];
 			var htmlFile = path.join(dest, page.filePath);
@@ -129,5 +190,7 @@ module.exports = function (grunt) {
 			var html = jade.renderFile(tamplate, page);
 			grunt.file.write(htmlFile, html);
 		}
+
+		grunt.file.write(path.join(dest, "menus.json"), JSON.stringify(rootFile.files))
 	});
 };

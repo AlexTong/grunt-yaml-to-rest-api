@@ -1,4 +1,67 @@
+doctype html
 html
 	head
-		meta(http-equiv="refresh" content="0;url=" + indexPage)
-	body
+		title= title
+		meta(charset="utf-8")
+		meta(name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1")
+		link(rel="stylesheet" type="text/css" href="./resources/css.css")
+		link(rel="stylesheet" type="text/css" href="./resources/api.css")
+	body.v-box
+		.box.ui.pointing.secondary.menu
+			.header.item camsi 接口定义
+		.flex-box
+			.h-box
+				.box
+					#fileTree
+						template(name="node-default")
+							div(c-onclick="open(node)")
+								i(c-class="node.isDir?'icon folder outline':'icon file'")
+								span(c-bind="node.name")
+				.flex-box
+
+					#iframe
+	script(src="./resources/javascript.js")
+	script.
+		cola(function (model) {
+			model.describe("nodes", {
+				provider: "./menus.json"
+			});
+			model.action({
+				getIcon: function (item) {
+					console.log(item)
+					return item.get("isDir") ? 'icon folder outline' : 'icon file';
+				},
+				open: function (item) {
+					if (!item.get("isDir")) {
+						cola.widget("iframe").set("path", "./" + item.get("path"));
+					}
+				}
+			})
+			model.widgetConfig({
+				iframe: {
+					$type: "IFrame"
+				},
+				fileTree: {
+					$type: "tree",
+					width: "200px",
+					changeCurrentItem: true,
+					highlightCurrentItem: true,
+					autoCollapse: false,
+					autoExpand: true,
+					bind: {
+						hasChildProperty: "isDir",
+						expression: "node in nodes",
+						child: {
+							recursive: true,
+							hasChildProperty: "isDir",
+							expression: "node in node.files"
+						}
+					},
+					itemClick: function (self, arg) {
+						self.get$Dom().find(".current-node").removeClass("current-node")
+						$(arg.dom).addClass("current-node")
+						return false;
+					}
+				}
+			});
+		});
