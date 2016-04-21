@@ -127,7 +127,6 @@ module.exports = function (grunt) {
 		function addFile(filePath) {
 			var pathObj = path.parse(filePath)
 			var dirName = pathObj.dir;
-			console.log(pathObj);
 			addDir(dirName);
 			var parentNode = findDir(path.sep + dirName, rootFile);
 			parentNode.files.push({
