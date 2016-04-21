@@ -1,0 +1,62 @@
+extends api-layout
+block content
+	mixin _makeAPIButtons(api)
+		a.item.switch-button(index= api.index class= api.index == 0 ? "active" : "")
+			span= api.name
+
+	mixin _makeAPIContents(api)
+		.item.basic-info(class= api.index == 0 ? "active" : "")
+			p.request-name
+				label 接口名称:
+				span= api.name
+			p.request-type
+				label 类型:
+				span= api.type
+			p.request-url
+				label 接口地址:
+				a= api.url
+
+			.ui.top.secondary.pointing.menu
+				if api.requestParams
+					a.item(data-tab="requestParams" class= api.activeTab == "requestParams" ? "active" : "") Request Params
+				if api.requestBody
+					a.item(data-tab="requestBody" class= api.activeTab == "requestBody" ? "active" : "") Request Body
+				if api.response
+					a.item(data-tab="response" class= api.activeTab == "response" ? "active" : "") Response
+			if api.requestParams
+				.ui.tab.segment.basic.request-params(data-tab="requestParams" class= api.activeTab == "requestParams" ?
+						"active" : "")
+					each item in api.requestParams
+						.item
+							.item-header
+								strong=item.name
+								.type=item.type || "String"
+								em=item.label
+							pre.description!=item.description
+			if api.requestBody
+				.ui.tab.segment.basic(data-tab="requestBody" class= api.activeTab == "requestBody" ?
+						"active" : "")
+					.nitem
+						span 请求体类型:
+						.type=api.requestBody.type || "Object"
+					label 详细描述
+					pre.description!=api.requestBody.description
+			if api.response
+				.ui.tab.vertical.segment.basic(data-tab="response" class= api.activeTab == "response" ? "active" :
+						"")
+					.item
+						span 相应体类型:
+						.type=api.response.type || "Object"
+					label 详细描述
+					pre.description!=api.response.description
+	.ui.pointing.menu
+		each item in interfaces
+			+_makeAPIButtons(item)
+
+	#api-card-book(c-widget="CardBook;")
+		each item in interfaces
+			+_makeAPIContents(item)
+
+
+
+
